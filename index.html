@@ -77,8 +77,6 @@
             fetch("https://raw.githubusercontent.com/mitchmacmillan/ForecastFWI/refs/heads/main/FWI_PEI_Polygon.geojson")
                 .then(response => response.json())
                 .then(data => {
-
-                    console.log("Feature properties:", feature.properties);
 					
 					function popup(feature, layer) {
                         layer.bindPopup(
