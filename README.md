@@ -3,4 +3,4 @@ An unofficial estimate of tomorrow's FWI using high resolution (2.5 km) gridded 
   
 For official Burning Restrictions and Fire Weather Index information see the <a href="https://www.princeedwardisland.ca/en/feature/burning-restrictions/#/service/FireRestrictions/FireRestrictions" target="_blank">Government of Prince Edward Island Burning Restrictions page</a>.
 
-<a href="https://mitchmacmillan.github.io/ForecastFWI" target="_blank">View the ForecastFWI map</a>
+<a href="https://mitchmacmillan.github.io/ForecastFWI" target="_blank">View the ForecastFWI map</a>.
