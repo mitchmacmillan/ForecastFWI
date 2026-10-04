@@ -78,7 +78,9 @@
                 .then(response => response.json())
                 .then(data => {
 
-                    function popup(feature, layer) {
+                    console.log("Feature properties:", feature.properties);
+					
+					function popup(feature, layer) {
                         layer.bindPopup(
                             "Predicted FWI Value: " + 
                             feature.properties.value.toFixed(2)
@@ -95,16 +97,12 @@
                         onEachFeature: popup
                     });
 
-                    //categorized.addTo(map);
-
                     const baseMaps = {
                         "Categorized": categorized,
                         "Continuous": continuous
                     };
 
                     categorized.addTo(map);
-
-                    //L.control.layers(baseMaps, null, {collapsed: false}).addTo(map);
 
                     const layerControl = L.control.layers(
                         baseMaps,
