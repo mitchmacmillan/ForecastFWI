@@ -20,10 +20,10 @@
     <style>
         /* Make the webmap full screen */
 		#map {position: absolute; top: 0; bottom: 0; left: 0; right: 0;}
-    </style>
+	</style>
 
         <title>ForecastFWI</title>
-
+        
     </head>
 
     <body>
@@ -34,9 +34,9 @@
             // Use OpenStreetMap tiles for the basemap
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 minZoom: 8,  // Out
-	        maxZoom: 11, // In
-		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-	    }).addTo(map);
+			    maxZoom: 11, // In
+		        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+		    }).addTo(map);
 
             // Add scale bar
             L.control.scale({
@@ -44,51 +44,67 @@
                 imperial: false,
                 position: "bottomleft"
             }).addTo(map);
-
-            // Create symbology styles
-            function categorizedStyle(feature) {
-                const v = feature.properties.value;
-                let color;
-
-                if (v < 6) color = "#2c7bb6";
-                else if (v < 16) color = "#ffff97";
-                else if (v < 23) color = "#ffd063";
-                else if (v < 30) color = "#E38D01";
-                else color = "#C7191C";
-
-                return {
-                    fillColor: color,
-                    fillOpacity: 0.8,
-                    weight: 0
-                };
-            }
-
-            function continuousStyle(feature) {
-                const v = feature.properties.value;
-                const t = Math.max(0, Math.min(1, v / 50));
-
-                return {
-                    fillColor: d3.interpolateRdYlGn(1 - t),
-                    fillOpacity: 0.8,
-                    weight: 0
-                };
-            }
          
             fetch("https://raw.githubusercontent.com/mitchmacmillan/ForecastFWI/refs/heads/main/FWI_PEI_Polygon.geojson")
                 .then(response => response.json())
                 .then(data => {
-					
-					function popup(feature, layer) {
+
+                    function popup(feature, layer) {
                         layer.bindPopup(
                             "Predicted FWI Value: " + 
                             feature.properties.value.toFixed(2)
                         );
                     }
 
+                    // Create categorized style
+                    function categorizedStyle(feature) {
+                        const v = feature.properties.value;
+                        let color;
+
+                        if (v < 6) color = "#2c7bb6";
+                        else if (v < 16) color = "#ffff97";
+                        else if (v < 23) color = "#ffd063";
+                        else if (v < 30) color = "#E38D01";
+                        else color = "#C7191C";
+
+                        return {
+                            fillColor: color,
+                            fillOpacity: 0.8,
+                            weight: 0
+                        };
+                    }
+
                     const categorized = L.geoJSON(data, {
                         style: categorizedStyle,
                         onEachFeature: popup
                     });
+
+                    // Create continuous style
+                    // Extract the minimum and maximum FWI values
+                    const fwiValues = data.features.map(feature => feature.properties.value);
+                    const minValue = Math.min(...fwiValues);
+                    const maxValue = Math.max(...fwiValues); // "..." converts an array [] into a list ()
+                    console.log('Min:', minValue, 'Max:', maxValue); // Test
+
+                    // Determine the range of FWI values
+                    function continuousStyle(feature) {
+                        const v = feature.properties.value;
+                        let fwiRange;
+                        if (maxValue - minValue === 0) {
+                            fwiRange = 1;
+                        } else {
+                            fwiRange = maxValue - minValue
+                        }
+                        console.log('Range:', fwiRange);
+                        const t = Math.max(0, Math.min(1, (v - minValue)/fwiRange))
+
+                        // Interpolate color using the extracted range of FWI values
+                        return {
+                            fillColor: d3.interpolateRdYlGn(1 - t),
+                            fillOpacity: 0.8,
+                            weight: 0
+                        };
+                    }       
 
                     const continuous = L.geoJSON(data, {
                         style: continuousStyle,
@@ -116,7 +132,7 @@
                     layerControl.getContainer().insertBefore(
                         title,
                         layerControl.getContainer().firstChild
-                    );    
+                    );                         
 
                 })
                 .catch(err => console.error(err));            
